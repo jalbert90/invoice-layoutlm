@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from paddleocr import PaddleOCR
 from PIL import Image
@@ -33,7 +34,6 @@ def polygon_to_bbox(polygon):
 
 def process_image(image_path):
     result = ocr.ocr(str(image_path))
-    print('\n\n', image_path.name, '\n')
 
     image = Image.open(image_path)
     width, height = image.size
@@ -72,11 +72,9 @@ def main():
 
     data = process_image(test_image_path)
 
-    # Create an output file.
-    # Save data as json
-
     output_file = output_dir / f'{test_image_path.stem}.json'
-    
+    with open(output_file, 'w') as f:
+        json.dump(data, f, indent=2)
 
 if __name__ == '__main__':
     main()
