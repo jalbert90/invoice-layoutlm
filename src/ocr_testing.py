@@ -1,6 +1,6 @@
 import json
-from pathlib import Path
 from paddleocr import PaddleOCR
+from pathlib import Path
 from PIL import Image
 
 ocr = PaddleOCR(use_angle_cls=True, lang='en')
