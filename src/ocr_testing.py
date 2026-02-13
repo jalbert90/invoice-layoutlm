@@ -5,7 +5,18 @@ ocr = PaddleOCR(use_angle_cls=True, lang='en')
 
 def process_image(image_path):
     result = ocr.ocr(str(image_path))
-    print(result)
+    print('\n\n', image_path.name, '\n')
+
+    if result and result[0]:
+        for item in result[0]:
+            polygon = item[0]
+            text, confidence = item[1]
+
+            # Skip empty boxes
+            if text.strip() == '':
+                continue
+
+            print(f'{polygon} \t {confidence} \t {text}')
 
 def main():
     
@@ -14,9 +25,9 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     gen = input_dir.glob('*')
-    test_image = next(gen)
+    test_image_path = next(gen)
 
-    process_image(test_image)
+    process_image(test_image_path)
 
 if __name__ == '__main__':
     main()
