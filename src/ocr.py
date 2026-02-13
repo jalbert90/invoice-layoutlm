@@ -1,6 +1,10 @@
 from pathlib import Path
-
 from paddleocr import PaddleOCR
+
+ocr = PaddleOCR(use_angle_cls=True, lang='en')
+
+def process_image(image_path):
+    result = ocr.ocr(str(image_path))
 
 def main():
     
