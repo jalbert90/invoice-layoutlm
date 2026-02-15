@@ -7,4 +7,5 @@ opencv-python-headless<4.10.0
 
 # Untested as of 2-15-26 at 12:30 PM EST:
 
-transformers
+transformers~=5.1.0
+torch~=2.10.0
