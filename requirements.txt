@@ -1,0 +1,10 @@
+# Install in this order:
+
+paddlepaddle==2.6.2
+paddleocr==2.7.0.3
+numpy<2.0.0
+opencv-python-headless<4.10.0
+
+# Untested as of 2-15-26 at 12:30 PM EST:
+
+transformers

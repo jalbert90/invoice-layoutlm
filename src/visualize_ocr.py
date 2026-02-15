@@ -23,7 +23,6 @@ def visualize_ocr(image_path, ocr_raw_path, output_dir='data/visualize_ocr'):
     print(f'Visualization saved as {output_path}')
 
 def main():
-
     visualize_ocr('data/images/batch1_1/batch1-0062.jpg', 'data/ocr_raw/batch1-0062.json')
 
 if __name__ == '__main__':
