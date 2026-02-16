@@ -48,7 +48,6 @@ encoding = processor(
     return_tensors='pt'
 )
 
-outputs = model(**encoding)
+output = model(**encoding)
 
-print(outputs.loss)
-print(outputs.logits.shape)
+print(output)
