@@ -4,6 +4,15 @@ from PIL import Image
 from transformers import LayoutLMv3Processor, LayoutLMv3ForTokenClassification
 
 ocr_dir = Path('data/ocr')
+docs = []
+
+for ocr_path in ocr_dir.glob('*'):
+    with open(ocr_path, 'r') as f:
+        ocr_data = json.load(f)
+
+    docs.append(ocr_data)
+
+
 images_dir = Path('data/images/batch1_1')
 ocr_gen = ocr_dir.glob('*0062*')
 images_gen = images_dir.glob('*0062*')
@@ -48,4 +57,7 @@ encoding = processor(
     return_tensors='pt'
 )
 
-print(encoding)
+outputs = model(**encoding)
+
+print(outputs.loss)
+print(outputs.logits.shape)
