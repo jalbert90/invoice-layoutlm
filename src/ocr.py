@@ -57,6 +57,7 @@ def process_image(image_path):
             tokens.append(text)
 
     return {
+        'image_path': str(image_path),
         'tokens': tokens,
         'bboxes': bboxes
     }
