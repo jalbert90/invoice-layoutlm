@@ -1,26 +1,65 @@
+from itertools import islice
 import json
 from pathlib import Path
+
 from PIL import Image
-from transformers import LayoutLMv3Processor, LayoutLMv3ForTokenClassification
+from torch.utils.data import Dataset
+from transformers import LayoutLMv3ForTokenClassification, LayoutLMv3Processor
+
+class InvoiceDataset(Dataset):
+    def __init__(self, docs, processor, label2id):
+        self.docs = docs
+        self.processor = processor
+        self.label2id = label2id
+    
+    def __len__(self):
+        return len(self.docs)
+    
+    def __getitem__(self, idx):
+        doc = self.docs[idx]
+
+        image_path = doc['image_path']
+        tokens = doc['tokens']
+        bboxes = doc['bboxes']
+        labels = [self.label2id[label] for label in doc['labels']]
+
+        image = Image.open(image_path).convert('RGB')
+
+        encoding = self.processor(
+            images=image,
+            text=tokens,
+            boxes=bboxes,
+            word_labels=labels,
+            padding='max_length',
+            truncation=True,
+            max_length=512,
+            return_tensors='pt'
+        )
+
+        # Strip batch dimension
+        encoding = {k: v.squeeze(0) for k, v in encoding.items()}
+
+        return encoding
 
 ocr_dir = Path('data/ocr')
-images_dir = Path('data/images/batch1_1')
-ocr_gen = ocr_dir.glob('*0062*')
-images_gen = images_dir.glob('*0062*')
-test_ocr_path = next(ocr_gen)
-test_image_path = next(images_gen)
+docs = []
+
+gen = ocr_dir.glob('*')
+test_ocr_path = next(gen)
 
 with open(test_ocr_path, 'r') as f:
-    ocr_data = json.load(f)
+    test_doc = json.load(f)
 
-tokens = ocr_data['tokens']
-bboxes = ocr_data['bboxes']
-labels = ocr_data['labels']
+test_image = Image.open(test_doc['image_path']).convert('RGB')
 
-label2id = {label: i for i, label in enumerate(set(labels))}
+for ocr_path in islice(ocr_dir.glob('*'), 5):
+    with open(ocr_path, 'r') as f:
+        doc = json.load(f)
+
+    docs.append(doc)
+
+label2id = {label: i for i, label in enumerate(set(docs[0]['labels']))}
 id2label = {i: label for label, i in label2id.items()}
-
-test_image = Image.open(test_image_path).convert('RGB')
 
 # Tokenize words (OCR "tokens"), convert tokens to ids, duplicate bounding boxes,
 # and preprocess images.
@@ -38,16 +77,20 @@ model = LayoutLMv3ForTokenClassification.from_pretrained(
 )
 
 encoding = processor(
-    images=test_image,
-    text=tokens,
-    boxes=bboxes,
-    word_labels=[label2id[label] for label in labels],
-    padding='max_length',
-    truncation=True,
-    max_length=512,
-    return_tensors='pt'
-)
+            images=test_image,
+            text=test_doc['tokens'],
+            boxes=test_doc['bboxes'],
+            word_labels=[label2id[label] for label in test_doc['labels']],
+            padding='max_length',
+            truncation=True,
+            max_length=512,
+            return_tensors='pt'
+        )
 
-output = model(**encoding)
+data = InvoiceDataset(docs, processor, label2id)
 
-print(output)
+for k, v in encoding.items():
+    print(k, v.shape)
+
+for k, v in data[0].items():
+    print(k, v.shape)

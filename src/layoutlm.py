@@ -1,8 +1,10 @@
 import json
-from torch.utils.data import Dataset
 from pathlib import Path
+
 from PIL import Image
-from transformers import LayoutLMv3Processor, LayoutLMv3ForTokenClassification
+from sklearn.model_selection import train_test_split
+from torch.utils.data import Dataset
+from transformers import LayoutLMv3ForTokenClassification, LayoutLMv3Processor, TrainingArguments
 
 class InvoiceDataset(Dataset):
     def __init__(self, docs, processor, label2id):
@@ -14,15 +16,17 @@ class InvoiceDataset(Dataset):
         return len(self.docs)
     
     def __getitem__(self, idx):
-        item = self.docs[idx]
+        doc = self.docs[idx]
 
-        image_path = item['image_path']
-        tokens = item['tokens']
-        bboxes = item['bboxes']
-        labels = [self.label2id[label] for label in item['labels']]
+        image_path = doc['image_path']
+        tokens = doc['tokens']
+        bboxes = doc['bboxes']
+        labels = [self.label2id[label] for label in doc['labels']]
+
+        image = Image.open(image_path).convert('RGB')
 
         encoding = self.processor(
-            images=image_path,
+            images=image,
             text=tokens,
             boxes=bboxes,
             word_labels=labels,
@@ -31,6 +35,11 @@ class InvoiceDataset(Dataset):
             max_length=512,
             return_tensors='pt'
         )
+
+        # Strip batch dimension
+        encoding = {k: v.squeeze(0) for k, v in encoding.items()}
+
+        return encoding
 
 ocr_dir = Path('data/ocr')
 docs = []
@@ -41,10 +50,8 @@ for ocr_path in ocr_dir.glob('*'):
 
     docs.append(doc)
 
-label2id = {label: i for i, label in enumerate(set(labels))}
+label2id = {label: i for i, label in enumerate(set(docs[0]['labels']))}
 id2label = {i: label for label, i in label2id.items()}
-
-# test_image = Image.open(test_image_path).convert('RGB')
 
 # Tokenize words (OCR "tokens"), convert tokens to ids, duplicate bounding boxes,
 # and preprocess images.
@@ -61,18 +68,9 @@ model = LayoutLMv3ForTokenClassification.from_pretrained(
     label2id=label2id
 )
 
-# encoding = processor(
-#     images=test_image,
-#     text=tokens,
-#     boxes=bboxes,
-#     word_labels=[label2id[label] for label in labels],
-#     padding='max_length',
-#     truncation=True,
-#     max_length=512,
-#     return_tensors='pt'
-# )
+train_docs, val_docs = train_test_split(docs, test_size=0.75, random_state=5)
 
-# outputs = model(**encoding)
+train_dataset = InvoiceDataset(train_docs, processor, label2id)
+val_dataset = InvoiceDataset(val_docs, processor, label2id)
 
-# print(outputs.loss)
-# print(outputs.logits.shape)
+# training_args = TrainingArguments(...)
