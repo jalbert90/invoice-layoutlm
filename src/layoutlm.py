@@ -4,7 +4,7 @@ from pathlib import Path
 from PIL import Image
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset
-from transformers import LayoutLMv3ForTokenClassification, LayoutLMv3Processor, TrainingArguments
+from transformers import LayoutLMv3ForTokenClassification, LayoutLMv3Processor, TrainingArguments, Trainer
 
 class InvoiceDataset(Dataset):
     def __init__(self, docs, processor, label2id):
@@ -73,4 +73,24 @@ train_docs, val_docs = train_test_split(docs, test_size=0.75, random_state=5)
 train_dataset = InvoiceDataset(train_docs, processor, label2id)
 val_dataset = InvoiceDataset(val_docs, processor, label2id)
 
-# training_args = TrainingArguments(...)
+training_args = TrainingArguments(
+    output_dir='layoutlmv3-client',
+    per_device_train_batch_size=2,
+    per_device_eval_batch_size=2,
+    num_train_epochs=10,
+    eval_strategy='epoch',
+    save_strategy='epoch',
+    learning_rate=5e-5,
+    weight_decay=0.01,
+    logging_steps=10,
+    remove_unused_columns=False
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=val_dataset
+)
+
+trainer.train()
