@@ -33,7 +33,7 @@ class InvoiceDataset(Dataset):
             word_labels=labels,
             padding='max_length',
             truncation=True,
-            max_length=512,
+            max_length=128,
             return_tensors='pt'
         )
 
@@ -69,21 +69,24 @@ model = LayoutLMv3ForTokenClassification.from_pretrained(
     label2id=label2id
 )
 
-train_docs, val_docs = train_test_split(docs, test_size=0.75, random_state=5)
+train_docs, val_docs = train_test_split(docs, test_size=0.25, random_state=5)
 
 train_dataset = InvoiceDataset(train_docs, processor, label2id)
 val_dataset = InvoiceDataset(val_docs, processor, label2id)
 
 training_args = TrainingArguments(
     output_dir='layoutlmv3-client',
-    per_device_train_batch_size=2,
-    per_device_eval_batch_size=2,
-    num_train_epochs=10,
+    per_device_train_batch_size=1,
+    per_device_eval_batch_size=1,
+    gradient_accumulation_steps=4,
+    num_train_epochs=1,
     eval_strategy='epoch',
     save_strategy='epoch',
+    save_total_limit=1,
+    fp16=True,
     learning_rate=5e-5,
     weight_decay=0.01,
-    logging_steps=10,
+    logging_steps=1,
     remove_unused_columns=False
 )
 
