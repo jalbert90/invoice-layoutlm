@@ -1,3 +1,4 @@
+from itertools import islice
 import json
 from pathlib import Path
 
@@ -44,7 +45,7 @@ class InvoiceDataset(Dataset):
 ocr_dir = Path('data/ocr')
 docs = []
 
-for ocr_path in ocr_dir.glob('*'):
+for ocr_path in islice(ocr_dir.glob('*'), 100):
     with open(ocr_path, 'r') as f:
         doc = json.load(f)
 

@@ -1,0 +1,38 @@
+2026-02-18 @ 0945
+
+{'loss': '0.1162', 'grad_norm': '0.8524', 'learning_rate': '4.927e-05', 'epoch': '0.1613'}                                                                                                                                 
+{'loss': '0.006093', 'grad_norm': '0.05958', 'learning_rate': '4.847e-05', 'epoch': '0.3226'}                                                                                                                              
+{'loss': '0.001715', 'grad_norm': '0.07947', 'learning_rate': '4.766e-05', 'epoch': '0.4839'}                                                                                                                              
+{'loss': '0.004389', 'grad_norm': '0.4331', 'learning_rate': '4.685e-05', 'epoch': '0.6452'}                                                                                                                               
+{'loss': '0.00378', 'grad_norm': '0.2355', 'learning_rate': '4.605e-05', 'epoch': '0.8065'}                                                                                                                                
+{'loss': '0.01291', 'grad_norm': '0.05635', 'learning_rate': '4.524e-05', 'epoch': '0.9677'}                                                                                                                               
+{'eval_loss': '0.002242', 'eval_runtime': '100.9', 'eval_samples_per_second': '3.718', 'eval_steps_per_second': '1.864', 'epoch': '1'}                                                                                     
+Writing model shards: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:01<00:00,  1.80s/it]
+{'loss': '0.01052', 'grad_norm': '0.1037', 'learning_rate': '4.444e-05', 'epoch': '1.129'}                                                                                                                                 
+{'loss': '0.003346', 'grad_norm': '0.007422', 'learning_rate': '4.363e-05', 'epoch': '1.29'}                                                                                                                               
+{'loss': '0.0009677', 'grad_norm': '0.007096', 'learning_rate': '4.282e-05', 'epoch': '1.452'}                                                                                                                             
+{'loss': '0.0001125', 'grad_norm': '0.002934', 'learning_rate': '4.202e-05', 'epoch': '1.613'}                                                                                                                             
+{'loss': '7.547e-05', 'grad_norm': '0.002217', 'learning_rate': '4.121e-05', 'epoch': '1.774'}                                                                                                                             
+{'loss': '5.978e-05', 'grad_norm': '0.001417', 'learning_rate': '4.04e-05', 'epoch': '1.935'}                                                                                                                              
+{'eval_loss': '3.481e-05', 'eval_runtime': '97.32', 'eval_samples_per_second': '3.853', 'eval_steps_per_second': '1.932', 'epoch': '2'}                                                                                    
+Writing model shards: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:01<00:00,  1.69s/it]
+{'loss': '4.667e-05', 'grad_norm': '0.001934', 'learning_rate': '3.96e-05', 'epoch': '2.097'}                                                                                                                              
+{'loss': '3.763e-05', 'grad_norm': '0.001036', 'learning_rate': '3.879e-05', 'epoch': '2.258'}                                                                                                                             
+{'loss': '0.001545', 'grad_norm': '0.001252', 'learning_rate': '3.798e-05', 'epoch': '2.419'}                                                                                                                              
+{'loss': '0.0003741', 'grad_norm': '0.002394', 'learning_rate': '3.718e-05', 'epoch': '2.581'}                                                                                                                             
+{'loss': '7.084e-05', 'grad_norm': '0.06758', 'learning_rate': '3.637e-05', 'epoch': '2.742'}                                                                                                                              
+{'loss': '9.4e-05', 'grad_norm': '0.001318', 'learning_rate': '3.556e-05', 'epoch': '2.903'}                                                                                                                               
+{'eval_loss': '1.341e-05', 'eval_runtime': '101.3', 'eval_samples_per_second': '3.7', 'eval_steps_per_second': '1.855', 'epoch': '3'}                                                                                      
+Writing model shards: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:01<00:00,  1.76s/it]
+{'loss': '2.289e-05', 'grad_norm': '0.003105', 'learning_rate': '3.476e-05', 'epoch': '3.065'}                                                                                                                             
+{'loss': '2.727e-05', 'grad_norm': '0.0008454', 'learning_rate': '3.395e-05', 'epoch': '3.226'}                                                                                                                            
+{'loss': '1.872e-05', 'grad_norm': '0.0005261', 'learning_rate': '3.315e-05', 'epoch': '3.387'}                                                                                                                            
+ 34%|█████████████████████████████████████████████████████████████▊                                                                                                                      | 213/620 [21:26<30:22,  4.48s/it]^CTraceback (most recent call last):
+  File "/home/jacob/dev/invoice_layoutlm/src/layoutlm.py", line 96, in <module>
+    trainer.train()
+  File "/home/jacob/dev/invoice_layoutlm/.venv/lib/python3.10/site-packages/transformers/trainer.py", line 2170, in train
+    return inner_training_loop(
+  File "/home/jacob/dev/invoice_layoutlm/.venv/lib/python3.10/site-packages/transformers/trainer.py", line 2542, in _inner_training_loop
+    and (torch.isnan(tr_loss_step) or torch.isinf(tr_loss_step))
+KeyboardInterrupt
+ 34%|███▍      | 213/620 [21:31<41:07,  6.06s/it]  
