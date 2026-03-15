@@ -57,19 +57,21 @@ def process_image(image_path):
             tokens.append(text)
 
     return {
+        'image_path': str(image_path),
         'tokens': tokens,
         'bboxes': bboxes
     }
 
 def main():
     
-    input_dir = Path('data/images/batch1_1')
-    output_dir = Path('data/ocr')
+    input_dir = Path('data/B_training_images/curated')
+    output_dir = Path('data/C_ocr/curated')
     output_dir.mkdir(parents=True, exist_ok=True)
 
     gen = input_dir.glob('*')
     test_image_path = next(gen)
 
+    print(f'Processing {test_image_path.name}')
     data = process_image(test_image_path)
 
     output_file = output_dir / f'{test_image_path.stem}.json'

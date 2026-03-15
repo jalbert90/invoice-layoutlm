@@ -64,8 +64,8 @@ def process_image(image_path):
 
 def main():
     
-    input_dir = Path('data/images/batch1_1')
-    output_dir = Path('data/ocr')
+    input_dir = Path('data/B_training_images/curated')
+    output_dir = Path('data/C_ocr/curated')
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Generator items are yielded in disk order.
