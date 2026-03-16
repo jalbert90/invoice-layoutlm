@@ -32,7 +32,7 @@ class InvoiceDataset(Dataset):
             word_labels=labels,
             padding='max_length',
             truncation=True,
-            max_length=512,
+            max_length=128,
             return_tensors='pt'
         )
 
@@ -41,7 +41,7 @@ class InvoiceDataset(Dataset):
 
         return encoding
 
-ocr_dir = Path('data/ocr')
+ocr_dir = Path('data/C_ocr/curated')
 docs = []
 
 gen = ocr_dir.glob('*')
@@ -83,7 +83,7 @@ encoding = processor(
             word_labels=[label2id[label] for label in test_doc['labels']],
             padding='max_length',
             truncation=True,
-            max_length=512,
+            max_length=128,
             return_tensors='pt'
         )
 

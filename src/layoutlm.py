@@ -42,7 +42,7 @@ class InvoiceDataset(Dataset):
 
         return encoding
 
-ocr_dir = Path('data/ocr')
+ocr_dir = Path('data/C_ocr/curated')
 docs = []
 
 for ocr_path in islice(ocr_dir.glob('*'), 100):

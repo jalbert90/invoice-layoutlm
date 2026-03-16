@@ -116,3 +116,19 @@ training_args = TrainingArguments(
     logging_steps=1,
     remove_unused_columns=False
 )
+
+
+Diverse Dataset:
+
+{'loss': '3.056', 'grad_norm': 'inf', 'learning_rate': '5e-05', 'epoch': '0.1333'}                                                                                                                                         
+{'loss': '2.864', 'grad_norm': 'inf', 'learning_rate': '4.375e-05', 'epoch': '0.2667'}                                                                                                                                     
+{'loss': '3.05', 'grad_norm': 'inf', 'learning_rate': '3.75e-05', 'epoch': '0.4'}                                                                                                                                          
+{'loss': '3.087', 'grad_norm': '70.95', 'learning_rate': '3.125e-05', 'epoch': '0.5333'}                                                                                                                                   
+{'loss': '1.799', 'grad_norm': '34.72', 'learning_rate': '2.5e-05', 'epoch': '0.6667'}                                                                                                                                     
+{'loss': '0.9789', 'grad_norm': '15.53', 'learning_rate': '1.875e-05', 'epoch': '0.8'}                                                                                                                                     
+{'loss': '0.7828', 'grad_norm': '8.739', 'learning_rate': '1.25e-05', 'epoch': '0.9333'}                                                                                                                                   
+{'loss': '0.3387', 'grad_norm': '4.443', 'learning_rate': '6.25e-06', 'epoch': '1'}                                                                                                                                        
+{'eval_loss': '0.1313', 'eval_runtime': '2.944', 'eval_samples_per_second': '3.397', 'eval_steps_per_second': '3.397', 'epoch': '1'}                                                                                       
+Writing model shards: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:01<00:00,  1.79s/it]
+{'train_runtime': '32.42', 'train_samples_per_second': '0.925', 'train_steps_per_second': '0.247', 'train_loss': '1.994', 'epoch': '1'}                                                                                    
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 8/8 [00:32<00:00,  4.05s/it]
