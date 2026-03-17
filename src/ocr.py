@@ -1,4 +1,7 @@
+import argparse
+import cv2
 import json
+import numpy as np
 from paddleocr import PaddleOCR
 from pathlib import Path
 from PIL import Image
@@ -32,17 +35,15 @@ def polygon_to_bbox(polygon):
     ys = [point[1] for point in polygon]
     return [min(xs), min(ys), max(xs), max(ys)]
 
-def process_image(image_path):
-    result = ocr.ocr(str(image_path))
-
+def process_raw_ocr(raw_ocr, image_path):
     image = Image.open(image_path)
     width, height = image.size
 
     bboxes = []
     tokens = []
 
-    if result and result[0]:
-        for item in result[0]:
+    if raw_ocr and raw_ocr[0]:
+        for item in raw_ocr[0]:
             polygon = item[0]
             text, confidence = item[1]
 
@@ -62,21 +63,52 @@ def process_image(image_path):
         'bboxes': bboxes
     }
 
-def main():
-    
-    input_dir = Path('data/B_training_images/curated')
-    output_dir = Path('data/C_ocr/curated')
+def visualize_ocr(image_path, raw_ocr, output_dir):
+    image = cv2.imread(str(image_path))
+
+    for item in raw_ocr[0]:
+        bbox = np.array(item[0]).astype(np.int32)
+        cv2.polylines(image, [bbox], isClosed=True, color=(0,255,0))
+
+    output_path = output_dir / f'{image_path.stem}-overlay.jpg'
+    cv2.imwrite(str(output_path), image)
+
+def main(input_dir, output_dir, debug_dir):    
+    input_dir = Path(input_dir)
+    output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    if debug_dir:
+        debug_dir = Path(debug_dir)
+        debug_dir.mkdir(parents=True, exist_ok=True)
+        ocr_raw_dir = debug_dir / f'ocr_raw/{input_dir.name}'
+        ocr_raw_dir.mkdir(parents=True, exist_ok=True)
+        ocr_raw_visualize_dir = debug_dir / f'ocr_raw_visualize/{input_dir.name}'
+        ocr_raw_visualize_dir.mkdir(parents=True, exist_ok=True)
 
     # Generator items are yielded in disk order.
     for image_path in input_dir.glob('*'):
         print(f'Processing {image_path.name}')
 
-        data = process_image(image_path)
+        raw_ocr = ocr.ocr(str(image_path))
+        processed_ocr = process_raw_ocr(raw_ocr, image_path)
+
+        if debug_dir:
+            ocr_raw_output_file = ocr_raw_dir / f'{image_path.stem}.json'
+            with open(ocr_raw_output_file, 'w') as f:
+                json.dump(raw_ocr, f, indent=2)
+            
+            visualize_ocr(image_path, raw_ocr, ocr_raw_visualize_dir)
         
         output_file = output_dir / f'{image_path.stem}.json'
         with open(output_file, 'w') as f:
-            json.dump(data, f, indent=2)
+            json.dump(processed_ocr, f, indent=2)
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input_dir', type=str, default='data/2_training_pipeline/1_images/default')
+    parser.add_argument('--output_dir', type=str, default='data/2_training_pipeline/2_ocr/default')
+    parser.add_argument('--debug_dir', type=str, default=None)
+    args = parser.parse_args()
+
+    main(args.input_dir, args.output_dir, args.debug_dir)

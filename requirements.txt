@@ -11,3 +11,7 @@ transformers~=5.1.0
 torch~=2.10.0
 scikit-learn~=1.7.2
 accelerate~1.12.0
+
+# Even less strict
+
+argparse~=1.4

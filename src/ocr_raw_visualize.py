@@ -22,8 +22,5 @@ def visualize_ocr(image_path, ocr_raw_path, output_dir='data/visualize_ocr'):
 
     print(f'Visualization saved as {output_path}')
 
-def main():
-    visualize_ocr('data/B_training_images/curated/Invoice_11.jpg', 'data/ocr_raw/Invoice_11.json')
-
 if __name__ == '__main__':
-    main()
+    visualize_ocr('data/B_training_images/curated/Invoice_11.jpg', 'data/ocr_raw/Invoice_11.json')
