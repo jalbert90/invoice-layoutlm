@@ -73,7 +73,9 @@ def visualize_ocr(image_path, raw_ocr, output_dir):
     output_path = output_dir / f'{image_path.stem}-overlay.jpg'
     cv2.imwrite(str(output_path), image)
 
-def main(input_dir, output_dir, debug_dir):    
+def ocr_pipeline(input_dir, output_dir, debug_dir=None) -> list[dict[str, str]]:
+    """Returns OCR docs."""
+
     input_dir = Path(input_dir)
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -86,12 +88,15 @@ def main(input_dir, output_dir, debug_dir):
         ocr_raw_visualize_dir = debug_dir / f'ocr_raw_visualize/{input_dir.name}'
         ocr_raw_visualize_dir.mkdir(parents=True, exist_ok=True)
 
+    ocr_docs = []
+
     # Generator items are yielded in disk order.
     for image_path in input_dir.glob('*'):
         print(f'Processing {image_path.name}')
 
         raw_ocr = ocr.ocr(str(image_path))
         processed_ocr = process_raw_ocr(raw_ocr, image_path)
+        ocr_docs.append(processed_ocr)
 
         if debug_dir:
             ocr_raw_output_file = ocr_raw_dir / f'{image_path.stem}.json'
@@ -104,6 +109,8 @@ def main(input_dir, output_dir, debug_dir):
         with open(output_file, 'w') as f:
             json.dump(processed_ocr, f, indent=2)
 
+    return ocr_docs
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_dir', type=str, default='data/2_training_pipeline/1_images/default')
@@ -111,4 +118,4 @@ if __name__ == '__main__':
     parser.add_argument('--debug_dir', type=str, default=None)
     args = parser.parse_args()
 
-    main(args.input_dir, args.output_dir, args.debug_dir)
+    ocr_pipeline(args.input_dir, args.output_dir, args.debug_dir)
