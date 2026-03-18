@@ -41,7 +41,7 @@ class InvoiceDataset(Dataset):
 
         return encoding
 
-ocr_dir = Path('data/C_ocr/curated')
+ocr_dir = Path('data/2_training_pipeline/2_ocr/default')
 docs = []
 
 gen = ocr_dir.glob('*')
@@ -88,6 +88,9 @@ encoding = processor(
         )
 
 data = InvoiceDataset(docs, processor, label2id)
+
+# print(encoding)
+# print(data[0])
 
 for k, v in encoding.items():
     print(k, v.shape)

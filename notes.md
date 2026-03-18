@@ -13,3 +13,5 @@ data/
 ```
 
 ...maybe... refine this before making any more changes directory changes...
+
+- Organize by dataset so that image path can always be found when hardcoded into the ocr data.

@@ -1,12 +1,31 @@
 import argparse
-from transformers import LayoutLMv3ForTokenClassification
+from transformers import LayoutLMv3ForTokenClassification, LayoutLMv3Processor
+import torch
 
+from .layoutlm import InvoiceDataset
 from .ocr import ocr_pipeline
 
 def infer(input_dir, ocr_save_dir, debug_dir):
     ocr_docs = ocr_pipeline(input_dir, ocr_save_dir, debug_dir=debug_dir)
 
-    LayoutLMv3ForTokenClassification.from_pretrained('layoutlmv3-client/checkpoint-16')
+    processor = LayoutLMv3Processor.from_pretrained(
+        'microsoft/layoutlmv3-base',
+        apply_ocr=False
+    )    
+
+    model = LayoutLMv3ForTokenClassification.from_pretrained('layoutlmv3-client/checkpoint-16')
+
+    # Behaves like a list of dict[str, tensor]
+    encoded_dataset = InvoiceDataset(ocr_docs, processor)
+    sample = encoded_dataset[0]
+
+    model.eval()
+
+    with torch.no_grad():
+        outputs = model(**sample)
+
+    print(outputs.logits)
+    print(outputs.logits.shape)
 
     client_names = {}
 
