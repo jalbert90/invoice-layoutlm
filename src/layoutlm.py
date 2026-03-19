@@ -56,7 +56,7 @@ class InvoiceDataset(Dataset):
         return encoding
     
 def label2id(ocr_dict):
-    # I need to make this deterministic so that I know what the output of the logits tensor means!!!!!!!!!!!!!!!
+    # Non-deterministic, but saved in model config.json.
     return {label: i for i, label in enumerate(set(ocr_dict['labels']))}
 
 def main():
@@ -80,6 +80,7 @@ def main():
     )
 
     # Load the base weigths.
+    # Save the labels to reference when interpreting the inference output.
     model = LayoutLMv3ForTokenClassification.from_pretrained(
         'microsoft/layoutlmv3-base',
         num_labels=len(label2id),

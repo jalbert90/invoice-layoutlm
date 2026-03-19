@@ -1,9 +1,18 @@
+import math
+
 import argparse
 from transformers import LayoutLMv3ForTokenClassification, LayoutLMv3Processor
 import torch
 
 from .layoutlm import InvoiceDataset
 from .ocr import ocr_pipeline
+
+def softmax(logits):
+    s = 0
+    for l in logits:
+        sum += math.e ** l
+
+    return [(math.e ** l) / sum for l in logits]
 
 def infer(input_dir, ocr_save_dir, debug_dir):
     ocr_docs = ocr_pipeline(input_dir, ocr_save_dir, debug_dir=debug_dir)
@@ -26,6 +35,10 @@ def infer(input_dir, ocr_save_dir, debug_dir):
 
     print(outputs.logits)
     print(outputs.logits.shape)
+
+    probabilities = []
+    for logits in outputs.logits[0]:
+        probabilities.append(softmax(logits))
 
     client_names = {}
 
