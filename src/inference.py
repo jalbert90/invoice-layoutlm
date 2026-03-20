@@ -1,4 +1,6 @@
+import json
 import math
+from pathlib import Path
 
 import argparse
 from transformers import LayoutLMv3ForTokenClassification, LayoutLMv3Processor
@@ -10,23 +12,27 @@ from .ocr import ocr_pipeline
 def softmax(logits):
     s = 0
     for l in logits:
-        sum += math.e ** l
+        s += math.e ** l
 
-    return [(math.e ** l) / sum for l in logits]
+    return [(math.e ** l) / s for l in logits]
 
 def infer(input_dir, ocr_save_dir, debug_dir):
     ocr_docs = ocr_pipeline(input_dir, ocr_save_dir, debug_dir=debug_dir)
+
+    image_paths = [doc["image_path"] for doc in ocr_docs]
 
     processor = LayoutLMv3Processor.from_pretrained(
         'microsoft/layoutlmv3-base',
         apply_ocr=False
     )    
 
-    model = LayoutLMv3ForTokenClassification.from_pretrained('layoutlmv3-client/checkpoint-16')
+    model_dir = Path('layoutlmv3-client/checkpoint-16')
+    model = LayoutLMv3ForTokenClassification.from_pretrained(str(model_dir))
 
     # Behaves like a list of dict[str, tensor]
     encoded_dataset = InvoiceDataset(ocr_docs, processor)
-    sample = encoded_dataset[0]
+    sample_num = 2
+    sample = encoded_dataset[sample_num]
 
     model.eval()
 
@@ -39,6 +45,21 @@ def infer(input_dir, ocr_save_dir, debug_dir):
     probabilities = []
     for logits in outputs.logits[0]:
         probabilities.append(softmax(logits))
+
+    probabilities = torch.tensor(probabilities)
+    print(probabilities)
+
+    config_path = model_dir / f'config.json'
+    with open(config_path) as f:
+        config_data = json.load(f)
+
+    print(config_data["id2label"])
+    print(image_paths[sample_num])
+
+    count = 0
+    for token in ocr_docs[sample_num]["tokens"]:
+        print(round(probabilities[count][0].item(), 2), token)
+        count += 1
 
     client_names = {}
 
