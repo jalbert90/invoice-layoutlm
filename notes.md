@@ -16,6 +16,8 @@ data/
 
 - Organize by dataset so that image path can always be found when hardcoded into the ocr data.
 
+- Change image path in ocr data to image name.
+
 # Environment Notes:
 
 - Needed to install apt package swig on LT WSL2 in order to build the PyMuPDF wheel from source, which was needed to install paddleocr 2.7.0.3.

@@ -54,13 +54,10 @@ class InvoiceDataset(Dataset):
             )
 
         return encoding
-    
-def label2id(ocr_dict):
-    # Non-deterministic, but saved in model config.json.
-    return {label: i for i, label in enumerate(set(ocr_dict['labels']))}
 
-def main():
-    ocr_dir = Path('data/C_ocr/curated')
+def main(ocr_dir, model_save_dir):
+    ocr_dir = Path(ocr_dir)
+    model_save_dir = Path(model_save_dir)
     docs = []
 
     for ocr_path in islice(ocr_dir.glob('*'), 100):
@@ -69,7 +66,7 @@ def main():
 
         docs.append(doc)
 
-    label2id = label2id(docs[0])
+    label2id = {label: i for i, label in enumerate(set(docs[0]['labels']))}
     id2label = {i: label for label, i in label2id.items()}
 
     # Tokenize words (OCR "tokens"), convert tokens to ids, duplicate bounding boxes,
@@ -90,15 +87,15 @@ def main():
 
     train_docs, val_docs = train_test_split(docs, test_size=0.25, random_state=5)
 
-    train_dataset = InvoiceDataset(train_docs, processor, label2id)
-    val_dataset = InvoiceDataset(val_docs, processor, label2id)
+    train_dataset = InvoiceDataset(train_docs, processor, training=True, label2id=label2id)
+    val_dataset = InvoiceDataset(val_docs, processor, training=True, label2id=label2id)
 
     training_args = TrainingArguments(
-        output_dir='layoutlmv3-client',
+        output_dir=str(model_save_dir),
         per_device_train_batch_size=1,
         per_device_eval_batch_size=1,
         gradient_accumulation_steps=4,
-        num_train_epochs=7,
+        num_train_epochs=5,
         eval_strategy='epoch',
         save_strategy='best',
         metric_for_best_model='eval_loss',
@@ -121,4 +118,7 @@ def main():
     trainer.train()
 
 if __name__ == '__main__':
-    main()
+    OCR_DIR = 'data/2_training_pipeline/2_ocr/batch1_1'
+    MODEL_SAVE_DIR = 'models/batch1_1'
+
+    main(OCR_DIR, MODEL_SAVE_DIR)
