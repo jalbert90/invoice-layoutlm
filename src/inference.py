@@ -31,7 +31,7 @@ def infer(input_dir, ocr_save_dir, debug_dir):
 
     # Behaves like a list of dict[str, tensor]
     encoded_dataset = InvoiceDataset(ocr_docs, processor)
-    sample_num = 2
+    sample_num = 0
     sample = encoded_dataset[sample_num]
 
     model.eval()
@@ -39,26 +39,32 @@ def infer(input_dir, ocr_save_dir, debug_dir):
     with torch.no_grad():
         outputs = model(**sample)
 
-    print(outputs.logits)
+    config_path = model_dir / f'config.json'
+    with open(config_path) as f:
+        config_data = json.load(f)
+
+    print(f'\n\nImage Path:\n{image_paths[sample_num]}')
+
+    print('\nIndex Labels:')
+    print(config_data['id2label'], '\n')
+    print('Logits:\n')
     print(outputs.logits.shape)
+    print(outputs.logits)
 
     probabilities = []
     for logits in outputs.logits[0]:
         probabilities.append(softmax(logits))
 
     probabilities = torch.tensor(probabilities)
+    print('\nProbabilities:\n')
     print(probabilities)
 
-    config_path = model_dir / f'config.json'
-    with open(config_path) as f:
-        config_data = json.load(f)
-
-    print(config_data["id2label"])
-    print(image_paths[sample_num])
+    index_0_label = config_data['id2label']['0']
+    print(f'\nProb token is {index_0_label} | Token\n')
 
     count = 0
     for token in ocr_docs[sample_num]["tokens"]:
-        print(round(probabilities[count][0].item(), 2), token)
+        print(round(probabilities[count][0].item(), 2), '\t', token)
         count += 1
 
     client_names = {}
