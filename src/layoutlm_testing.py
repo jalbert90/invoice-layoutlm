@@ -95,9 +95,19 @@ encoding = processor(
             return_tensors='pt'
         )
 
-print(encoding['input_ids'].shape)
-print(encoding['input_ids'])
-print(encoding)
+ids = encoding['input_ids'][0].tolist()
+attention = encoding['attention_mask'][0]
+print(attention.sum().item())
+
+print(ids)
+
+tokens = processor.tokenizer.convert_ids_to_tokens(ids)
+
+print(tokens)
+
+decoded = processor.tokenizer.decode(ids, skip_special_tokens=True)
+
+print(decoded)
 
 # data = InvoiceDataset(docs, processor, label2id)
 

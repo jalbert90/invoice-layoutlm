@@ -22,3 +22,13 @@ data/
 
 - Needed to install apt package swig on LT WSL2 in order to build the PyMuPDF wheel from source, which was needed to install paddleocr 2.7.0.3.
 - pip install -r requirements.txt should work...
+
+# Math Notes:
+
+# Deprecated. Keeping for math reference only.
+# def softmax(logits):
+#     s = 0
+#     for l in logits:
+#         s += math.e ** l
+
+#     return [(math.e ** l) / s for l in logits]

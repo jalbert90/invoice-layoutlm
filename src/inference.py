@@ -9,13 +9,6 @@ import torch
 from .layoutlm import InvoiceDataset
 from .ocr import ocr_pipeline
 
-def softmax(logits):
-    s = 0
-    for l in logits:
-        s += math.e ** l
-
-    return [(math.e ** l) / s for l in logits]
-
 def infer(model_dir, input_dir, ocr_save_dir, debug_dir):
     ocr_docs = ocr_pipeline(input_dir, ocr_save_dir, debug_dir=debug_dir)
 
@@ -37,6 +30,8 @@ def infer(model_dir, input_dir, ocr_save_dir, debug_dir):
 
     sample_num = int(input('Enter sample number: '))
     sample = encoded_dataset[sample_num]
+    input_ids = sample['input_ids']
+    tokens = processor.tokenizer.convert_ids_to_tokens(input_ids[0])
 
     model.eval()
 
@@ -54,33 +49,34 @@ def infer(model_dir, input_dir, ocr_save_dir, debug_dir):
 
     print('\nIndex Labels:')
     print(config_data['id2label'], '\n')
-    print('Logits:\n')
-    print(outputs.logits.shape)
-    print(outputs.logits)
 
-    probabilities = []
-    for logits in outputs.logits[0]:
-        probabilities.append(softmax(logits))
+    probabilities = torch.softmax(outputs.logits, dim=-1)
 
-    probabilities = torch.tensor(probabilities)
-    print('\nProbabilities:\n')
-    print(probabilities.shape)
-    print(probabilities)
+    num_of_tokens = probabilities.shape[1]
+    for i in range(num_of_tokens):
+        prob_vector = probabilities[0][i].tolist()
+        prob_vector = [round(p, 2) for p in prob_vector]
+        token = tokens[i]        
+        print(f'{prob_vector}\t{token}')
 
-    probs = torch.softmax(outputs.logits, dim=-1)
+    # print('Logits:\n')
+    # print(outputs.logits.shape)
+    # print(outputs.logits)
 
-    print('\n\nBetter probs:\n')
-    print(probs.shape)
-    print(probs)
+    # print('\nProbabilities:\n')
+    # print(probabilities.shape)
+    # print(probabilities)
 
-    pred_ids = outputs.logits.argmax(dim=-1)
+    client_name_token_ids = []
+    token_index = 0
+    for v in probabilities[0]:
+        if v[client_name_index] >= 0.75:
+            client_name_token_ids.append(input_ids[0][token_index].item())
+        token_index += 1
 
-    print(f'\nProb token is client_name | Token\n')
-
-    count = 0
-    for token in ocr_docs[sample_num]["tokens"]:
-        print(round(probabilities[count][client_name_index].item(), 2), '\t', token)
-        count += 1
+    print('\n', client_name_token_ids)
+    client_name_tokens = processor.tokenizer.decode(client_name_token_ids, skip_special_tokens=True)
+    print(client_name_tokens)
 
     client_names = {}
 
