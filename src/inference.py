@@ -1,5 +1,4 @@
 import json
-import math
 from pathlib import Path
 
 import argparse
@@ -78,12 +77,27 @@ def infer(model_dir, input_dir, ocr_save_dir, debug_dir):
     client_name_tokens = processor.tokenizer.decode(client_name_token_ids, skip_special_tokens=True)
     print(client_name_tokens)
 
+    logits = outputs.logits
+    pred_ids = logits.argmax(dim=-1)[0]
+    print('\n', pred_ids)
+
+    client_label_id = model.config.label2id['client_name']
+    predicted_indicies = torch.where(pred_ids == client_label_id)[0]
+    print(predicted_indicies)
+
+    predicted_ids = input_ids[0][predicted_indicies]
+    predicted_tokens = processor.tokenizer.convert_ids_to_tokens(predicted_ids)
+    print(predicted_tokens)
+
+    predicted_tokens_decoded = processor.tokenizer.decode(predicted_ids, skip_special_tokens=True)
+    print(predicted_tokens_decoded)
+
     client_names = {}
 
     return client_names
 
 if __name__ == '__main__':
-    MODEL_DIR = 'models/batch1_1/checkpoint-95'
+    MODEL_DIR = 'models/curated/checkpoint-16'
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_dir', type=str, default='data/3_inference_pipeline/1_images/default')
