@@ -6,7 +6,7 @@ from PIL import Image
 from torch.utils.data import Dataset
 from transformers import LayoutLMv3ForTokenClassification, LayoutLMv3Processor
 
-OCR_DIR = 'data/3_inference_pipeline/2_ocr/default'
+OCR_DIR = 'data/2_training_pipeline/2_ocr/default'
 
 class InvoiceDataset(Dataset):
     def __init__(self, docs, processor, label2id):
@@ -46,7 +46,7 @@ class InvoiceDataset(Dataset):
 ocr_dir = Path(OCR_DIR)
 docs = []
 
-gen = ocr_dir.glob('*0003*')
+gen = ocr_dir.glob('*')
 
 # for ocr_path in islice(gen, 5):
 #     with open(ocr_path, 'r') as f:
@@ -66,8 +66,8 @@ for ocr_path in islice(ocr_dir.glob('*'), 5):
 
     docs.append(doc)
 
-# label2id = {label: i for i, label in enumerate(set(docs[0]['labels']))}
-# id2label = {i: label for label, i in label2id.items()}
+label2id = {label: i for i, label in enumerate(set(docs[0]['labels']))}
+id2label = {i: label for label, i in label2id.items()}
 
 # Tokenize words (OCR "tokens"), convert tokens to ids, duplicate bounding boxes,
 # and preprocess images.
@@ -88,28 +88,34 @@ encoding = processor(
             images=test_image,
             text=test_doc['tokens'],
             boxes=test_doc['bboxes'],
-            # word_labels=[label2id[label] for label in test_doc['labels']],
+            word_labels=[label2id[label] for label in test_doc['labels']],
             padding='max_length',
             truncation=True,
             # max_length=128,
             return_tensors='pt'
         )
 
-ids = encoding['input_ids'][0].tolist()
-attention = encoding['attention_mask'][0]
-print(attention.sum().item())
+# ids = encoding['input_ids'][0].tolist()
+# attention = encoding['attention_mask'][0]
+# print(attention.sum().item())
 
-print(ids)
+# print(ids)
 
-tokens = processor.tokenizer.convert_ids_to_tokens(ids)
+# tokens = processor.tokenizer.convert_ids_to_tokens(ids)
 
-print(tokens)
+# print(tokens)
 
-decoded = processor.tokenizer.decode(ids, skip_special_tokens=True)
+# decoded = processor.tokenizer.decode(ids, skip_special_tokens=True)
 
-print(decoded)
+# print(decoded)
 
 # data = InvoiceDataset(docs, processor, label2id)
+
+tokens = processor.tokenizer.convert_ids_to_tokens(encoding['input_ids'][0])
+labels = encoding['labels'][0]
+
+for t, l in zip(tokens, labels):
+    print(f'{l.item()}\t{t}')
 
 # print(encoding)
 # print(data[0])

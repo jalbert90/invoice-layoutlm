@@ -1,3 +1,11 @@
+# Next steps:
+
+1. Amass more unseen testing data in a testing folder.
+2. Test inference by inspection.
+3. Map inference predictions back to words.
+4. Implement metrics.
+5. Clean up inference output and make it save.
+
 # Ideas for later:
 
 - Change `ocr_pipeline()` to use save and debug flags so that saving isn't strictly necessary.
@@ -32,3 +40,12 @@ data/
 #         s += math.e ** l
 
 #     return [(math.e ** l) / s for l in logits]
+
+# Pipeline notes
+
+- OCR creates words, which are then labeled.
+- LayoutLMv3 then splits the words into tokens.
+  - The labels are not spread across the tokens by default.
+  - The first token of each word is given an integer label that matches the OCR label (as specified in label2id).
+  - The remaining tokens of each word are given the label -100, which means ignore during loss calculation.
+- Then, LayoutLM token predictions should be mapped back to an OCR word, trusting only the first token of each word.
