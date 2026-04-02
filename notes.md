@@ -1,10 +1,14 @@
 # Next steps:
 
-1. Amass more unseen testing data in a testing folder.
-2. Test inference by inspection.
-3. Map inference predictions back to words.
-4. Implement metrics.
-5. Clean up inference output and make it save.
+1. Amass more invoice images. (DONE)
+2. Move some to default/. (DONE)
+3. Make inference output show the results for multiple files for rapid testing.
+4. Test inference by inspection.
+5. Map predictions back to words.
+6. Implement metrics.
+7. Reorganize data -> dataset_name -> train/test -> etc
+8. Retrain, possibly expanding context width.
+9. Clean up inference output and make it save.
 
 # Ideas for later:
 
@@ -25,6 +29,8 @@ data/
 - Organize by dataset so that image path can always be found when hardcoded into the ocr data.
 
 - Change image path in ocr data to image name.
+
+- inference.py should take an input directory and output directory only. Output directory should be optional. Can later add output directory verbosity levels.
 
 # Environment Notes:
 
