@@ -92,11 +92,12 @@ def ocr_pipeline(input_dir, output_dir, debug_dir=None) -> list[dict[str, str]]:
 
     # Generator items are yielded in disk order.
     for image_path in input_dir.glob('*'):
-        print(f'Processing {image_path.name}')
+        print(f'\n\nProcessing {image_path.name}')
 
         raw_ocr = ocr.ocr(str(image_path))
         processed_ocr = process_raw_ocr(raw_ocr, image_path)
         ocr_docs.append(processed_ocr)
+        print()
 
         if debug_dir:
             ocr_raw_output_file = ocr_raw_dir / f'{image_path.stem}.json'

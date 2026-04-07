@@ -24,14 +24,32 @@ def infer(model_dir, input_dir, ocr_save_dir, debug_dir):
     # Behaves like a list of dict[str, tensor]
     encoded_dataset = InvoiceDataset(ocr_docs, processor)
 
-    print()
+    client_names = {}
+
     sample_num = 0
     for sample in encoded_dataset:
-        print(f'Running LayoutLM on {image_paths[sample_num]}')
+        print(f'\nRunning LayoutLM on {image_paths[sample_num]}')
         with torch.no_grad():
             output = model(**sample)
+
+        attention_mask = sample['attention_mask'][0]
+        num_non_pad_tokens = attention_mask.sum().item()
         
         input_ids = sample['input_ids'][0]
+        offset_mapping = sample['offset_mapping'][0][:num_non_pad_tokens].tolist()
+
+        word_indices = []
+        index_counter = -1
+        for offset in offset_mapping:
+            if offset == [0, 0]:
+                word_indices.append(None)
+                continue
+
+            if offset[0] == 0:
+                index_counter += 1
+                word_indices.append(index_counter)
+            else:
+                word_indices.append(index_counter)
 
         logits = output.logits
         pred_ids = torch.argmax(logits, dim=-1)[0]
@@ -39,11 +57,36 @@ def infer(model_dir, input_dir, ocr_save_dir, debug_dir):
         pred_client_name_indices = torch.where(pred_ids == client_name_id)[0]
         pred_client_name_input_ids = input_ids[pred_client_name_indices]
         pred_client_name_tokens = processor.tokenizer.convert_ids_to_tokens(pred_client_name_input_ids)
+        pred_client_name_token_word_indices = [word_indices[i] for i in pred_client_name_indices]
+
+        valid_pred_client_name_indices = []
+        valid_pred_client_name_input_ids = []
+        valid_client_name_token_word_indices = []
+        for i in pred_client_name_indices:
+            i = i.item()
+            if offset_mapping[i][0] == 0 and offset_mapping[i] != [0, 0]:
+                valid_pred_client_name_indices.append(i)
+                valid_pred_client_name_input_ids.append(input_ids[i])
+                valid_client_name_token_word_indices.append(word_indices[i])
+
+        valid_pred_client_name_tokens = processor.tokenizer.convert_ids_to_tokens(valid_pred_client_name_input_ids)
+
+        print()
         print(pred_client_name_tokens)
+        print(pred_client_name_token_word_indices)
+        print(valid_pred_client_name_tokens)
+        print(valid_client_name_token_word_indices)
+        print()
+
+        ocr_doc = ocr_docs[sample_num]
+        pred_words = [ocr_doc['tokens'][i] for i in valid_client_name_token_word_indices]
+
+        print(pred_words)
+        print()
+
+        client_names[image_paths[sample_num]] = pred_words
 
         sample_num += 1
-
-    client_names = {}
 
     return client_names
 

@@ -123,7 +123,7 @@ index_counter = -1
 for offset in offset_mapping:
     if offset == [0, 0]:
         word_indices.append(None)
-        pass
+        continue
 
     if offset[0] == 0:
         index_counter += 1

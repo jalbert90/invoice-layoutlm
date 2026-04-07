@@ -50,7 +50,8 @@ class InvoiceDataset(Dataset):
                 padding='max_length',
                 truncation=True,
                 max_length=128,
-                return_tensors='pt'
+                return_tensors='pt',
+                return_offsets_mapping=True
             )
 
         return encoding

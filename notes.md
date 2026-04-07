@@ -1,24 +1,10 @@
 # Next steps:
 
-1. Amass more invoice images. (DONE)
-2. Move some to default/. (DONE)
-3. Make inference output show the results for multiple files for rapid testing. (DONE)
-4. Test inference by inspection. (DONE)
-5. Map predictions back to words.
-
-[word0, word1] -> [token0, token1, token2, token3, token4]
-
-To map from token space back into word space, I think I will need a way to store word indicies for each token, like
-
-[token0, token1, token2, token3, token4]
-[0, 0, 1, 1, 1]
-
-...
-
-6. Implement metrics.
-7. Reorganize data -> dataset_name -> train/test -> etc
-8. Retrain, possibly expanding context width.
-9. Clean up inference output and make it save.
+1. Take highest probability prediction.
+2. Implement metrics.
+3. Reorganize data -> dataset_name -> train/test -> etc
+4. Retrain, possibly expanding context width.
+5. Clean up inference output and make it save.
 
 # Ideas for later:
 
@@ -41,6 +27,8 @@ data/
 - Change image path in ocr data to image name.
 
 - inference.py should take an input directory and output directory only. Output directory should be optional. Can later add output directory verbosity levels.
+
+- Fix the crazy long names in inference.py.
 
 # Environment Notes:
 
