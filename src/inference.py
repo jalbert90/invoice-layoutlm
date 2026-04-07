@@ -24,9 +24,24 @@ def infer(model_dir, input_dir, ocr_save_dir, debug_dir):
     # Behaves like a list of dict[str, tensor]
     encoded_dataset = InvoiceDataset(ocr_docs, processor)
 
+    print()
+    sample_num = 0
     for sample in encoded_dataset:
+        print(f'Running LayoutLM on {image_paths[sample_num]}')
         with torch.no_grad():
             output = model(**sample)
+        
+        input_ids = sample['input_ids'][0]
+
+        logits = output.logits
+        pred_ids = torch.argmax(logits, dim=-1)[0]
+        client_name_id = model.config.label2id['client_name']
+        pred_client_name_indices = torch.where(pred_ids == client_name_id)[0]
+        pred_client_name_input_ids = input_ids[pred_client_name_indices]
+        pred_client_name_tokens = processor.tokenizer.convert_ids_to_tokens(pred_client_name_input_ids)
+        print(pred_client_name_tokens)
+
+        sample_num += 1
     
     # print('\n\nSample Number | Sample Path\n')
     # for i in range(len(image_paths)):
