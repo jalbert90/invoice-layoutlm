@@ -92,18 +92,52 @@ encoding = processor(
             padding='max_length',
             truncation=True,
             # max_length=128,
-            return_tensors='pt'
+            return_tensors='pt',
+            return_offsets_mapping=True
         )
 
-# ids = encoding['input_ids'][0].tolist()
-# attention = encoding['attention_mask'][0]
+tokenizer = processor.tokenizer
+
+ids = encoding['input_ids'][0]
+attention = encoding['attention_mask'][0]
+num_non_pad_tokens = attention.sum().item()
 # print(attention.sum().item())
 
-# print(ids)
+ids = ids[:num_non_pad_tokens]
+print()
+print(ids)
 
-# tokens = processor.tokenizer.convert_ids_to_tokens(ids)
+tokens = tokenizer.convert_ids_to_tokens(ids)
 
-# print(tokens)
+print()
+print(tokens)
+
+print()
+print(test_doc['tokens'])
+
+offset_mapping = encoding['offset_mapping'][0]
+offset_mapping = offset_mapping[:num_non_pad_tokens].tolist()
+
+word_indices = []
+index_counter = -1
+for offset in offset_mapping:
+    if offset == [0, 0]:
+        word_indices.append(None)
+        pass
+
+    if offset[0] == 0:
+        index_counter += 1
+        word_indices.append(index_counter)
+    else:
+        word_indices.append(index_counter)
+
+print()
+print(word_indices)
+
+
+print()
+print(offset_mapping)
+print()
 
 # decoded = processor.tokenizer.decode(ids, skip_special_tokens=True)
 
@@ -111,11 +145,11 @@ encoding = processor(
 
 # data = InvoiceDataset(docs, processor, label2id)
 
-tokens = processor.tokenizer.convert_ids_to_tokens(encoding['input_ids'][0])
-labels = encoding['labels'][0]
+# tokens = processor.tokenizer.convert_ids_to_tokens(encoding['input_ids'][0])
+# labels = encoding['labels'][0]
 
-for t, l in zip(tokens, labels):
-    print(f'{l.item()}\t{t}')
+# for t, l in zip(tokens, labels):
+#     print(f'{l.item()}\t{t}')
 
 # print(encoding)
 # print(data[0])
