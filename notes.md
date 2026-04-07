@@ -2,8 +2,8 @@
 
 1. Amass more invoice images. (DONE)
 2. Move some to default/. (DONE)
-3. Make inference output show the results for multiple files for rapid testing.
-4. Test inference by inspection.
+3. Make inference output show the results for multiple files for rapid testing. (DONE)
+4. Test inference by inspection. (DONE)
 5. Map predictions back to words.
 6. Implement metrics.
 7. Reorganize data -> dataset_name -> train/test -> etc
