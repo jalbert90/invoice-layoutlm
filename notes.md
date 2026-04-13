@@ -1,6 +1,7 @@
 # Next steps:
 
-1. Take highest probability prediction.
+1. Take highest probability prediction. (SKIP)
+  - Bad idea. The client name may span multiple ocr boxes, in which case taken the highest prob prediction will only capture a partial client name. Instead, focus on better training.
 2. Implement metrics.
 3. Reorganize data -> dataset_name -> train/test -> etc
 4. Retrain, possibly expanding context width.

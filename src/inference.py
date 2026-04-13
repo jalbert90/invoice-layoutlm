@@ -11,7 +11,7 @@ from .ocr import ocr_pipeline
 def infer(model_dir, input_dir, ocr_save_dir, debug_dir):
     ocr_docs = ocr_pipeline(input_dir, ocr_save_dir, debug_dir=debug_dir)
 
-    image_paths = [doc["image_path"] for doc in ocr_docs]
+    image_paths = [Path(doc["image_path"]) for doc in ocr_docs]
 
     processor = LayoutLMv3Processor.from_pretrained(
         'microsoft/layoutlmv3-base',
@@ -26,9 +26,10 @@ def infer(model_dir, input_dir, ocr_save_dir, debug_dir):
 
     client_names = {}
 
+    print('\nRunning LayoutLM...')
     sample_num = 0
     for sample in encoded_dataset:
-        print(f'\nRunning LayoutLM on {image_paths[sample_num]}')
+        print(f'\nProcessing {image_paths[sample_num].name}')
         with torch.no_grad():
             output = model(**sample)
 
@@ -84,7 +85,7 @@ def infer(model_dir, input_dir, ocr_save_dir, debug_dir):
         print(pred_words)
         print()
 
-        client_names[image_paths[sample_num]] = pred_words
+        client_names[image_paths[sample_num].name] = pred_words
 
         sample_num += 1
 
