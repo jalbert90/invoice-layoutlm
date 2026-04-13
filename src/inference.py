@@ -85,7 +85,11 @@ def infer(model_dir, input_dir, ocr_save_dir, debug_dir):
         print(pred_words)
         print()
 
-        client_names[image_paths[sample_num].name] = pred_words
+        client_name_string = ''
+        for word in pred_words:
+            client_name_string += word + ', '
+
+        client_names[image_paths[sample_num].name] = client_name_string
 
         sample_num += 1
 

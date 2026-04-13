@@ -1,11 +1,13 @@
 # Next steps:
 
-1. Take highest probability prediction. (SKIP)
-  - Bad idea. The client name may span multiple ocr boxes, in which case taken the highest prob prediction will only capture a partial client name. Instead, focus on better training.
-2. Implement metrics.
-3. Reorganize data -> dataset_name -> train/test -> etc
-4. Retrain, possibly expanding context width.
-5. Clean up inference output and make it save.
+1. Clean up inference.py code (variable names too long, etc).
+2. Implement new data/ structure and deprecate old one.
+    - dataset_name -> train/test -> etc
+    - /old, downloaded/, datasets/, etc, under data/
+3. Implement new flag system for ocr and layoutlm.
+4. Make inference output save.
+5. Write metric calculation script.
+6. Retrain, possibly expanding context width.
 
 # Ideas for later:
 
@@ -38,6 +40,7 @@ data/
 
 # Math Notes:
 
+```python
 # Deprecated. Keeping for math reference only.
 # def softmax(logits):
 #     s = 0
@@ -45,6 +48,45 @@ data/
 #         s += math.e ** l
 
 #     return [(math.e ** l) / s for l in logits]
+```
+
+## Metrics
+
+- Implement metrics on testing data.
+- Associate with each test sample a ground truth JSON that has a key for each label:
+
+```json
+{
+  "client_name": "..."
+}
+```
+
+- Write script to compare inference output (saved or dynamic) to saved ground truth labels.
+
+### Exact Match Accuracy
+
+- $\text{accuracy} = \frac{\text{\# correct predictions}}{\text{\# samples}}$
+    - One accuracy per field, calculated across all test data
+    - Can have a total accuracy later (when using more than one field)
+
+### Precision, Recall, F1
+
+- Word-level
+- $\text{precision} = \frac{\text{\# valid found}}{\text{\# found}}$
+- $\text{recall} = \frac{\text{\# found}}{\text{\# valid}}$
+- F1: balance ... ?
+
+### Partial Match Accuracy
+
+- Use string similarity, like Levenshtein distance. Normalize.
+
+### End-to-End Accuracy
+
+$$
+\text{invoice\_accuracy} = \frac{\text{\# perfect invoices}}{\text{total}}
+$$
+
+- Number of completely correct invoices / total
 
 # Pipeline notes
 
